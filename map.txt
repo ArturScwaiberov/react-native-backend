@@ -1,0 +1,15 @@
+patient || doctors
+-id
+-avatar
+-full_name
+-gender
+-email
+-phone
+
+appointment
+-user_id
+-dent_number
+-diagnosis
+-price
+-date
+-time
