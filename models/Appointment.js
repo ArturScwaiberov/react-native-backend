@@ -6,6 +6,7 @@ const AppointmentSchema = new Schema(
 		patientId: { type: Schema.Types.ObjectId, ref: 'Patient' },
 		dentNumber: Number,
 		diagnosis: String,
+		description: String,
 		price: Number,
 		date: String,
 		time: String,
