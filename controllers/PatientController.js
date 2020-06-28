@@ -1,6 +1,7 @@
 const { Patient, Appointment } = require('../models')
 
 const { validationResult } = require('express-validator')
+const { orderBy, reduce, sortBy } = require('lodash')
 
 function PatientController() {}
 
@@ -141,12 +142,21 @@ const show = async function (req, res) {
 	const patientId = req.params.id
 
 	try {
-		const patient = await Patient.findById(patientId)
-			.populate('appointments')
-			.exec()
+		const patient = await Patient.findById(patientId).populate('appointments').exec()
 		res.json({
 			status: 'success',
-			data: { ...patient._doc, appointments: patient.appointments },
+			data: {
+				...patient._doc,
+				appointments: orderBy(
+					patient.appointments,
+					[
+						function (item) {
+							return new Date(item.date + ' ' + item.time)
+						},
+					],
+					['desc']
+				),
+			},
 		})
 	} catch (e) {
 		return res.status(404).json({

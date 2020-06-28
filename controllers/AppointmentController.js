@@ -1,5 +1,5 @@
 const { validationResult } = require('express-validator')
-const { groupBy, reduce, sortBy } = require('lodash')
+const { groupBy, reduce, orderBy, filter } = require('lodash')
 const dayjs = require('dayjs')
 const ruLocale = require('dayjs/locale/ru')
 
@@ -14,6 +14,7 @@ const create = async function (req, res) {
 		patientId: req.body.patientId,
 		dentNumber: req.body.dentNumber,
 		diagnosis: req.body.diagnosis,
+		description: req.body.description,
 		price: req.body.price,
 		date: req.body.date,
 		time: req.body.time,
@@ -59,6 +60,7 @@ const update = async function (req, res) {
 	const data = {
 		dentNumber: req.body.dentNumber,
 		diagnosis: req.body.diagnosis,
+		description: req.body.description,
 		price: req.body.price,
 		date: req.body.date,
 		time: req.body.time,
@@ -155,14 +157,24 @@ const all = function (req, res) {
 			res.json({
 				status: 'success',
 				message: reduce(
-					//we took all data and group it by date, make from it froups with title of day
-					groupBy(docs, 'date'),
+					groupBy(
+						filter(
+							orderBy(docs, [
+								function (item) {
+									return new Date(item.date + ' ' + item.time)
+								},
+							]),
+							function (item) {
+								return new Date() <= new Date(item.date + ' ' + item.time)
+							}
+						),
+						'date'
+					),
 					(result, value, key) => {
 						result = [...result, { title: dayjs(key).locale('ru').format('D MMMM'), data: value }]
 						return result
 					},
 					[]
-					//I want here add sortBy to sort groups by date and by time too
 				),
 			})
 		})
